@@ -1,30 +1,23 @@
 import java.util.*;
 
 public class Node{
-    private final String name;
+    final String name;
     final boolean isComputer;
-    private int strength;
-    private final Map<String, Node> connectedNodes;
-
-
-    private class RouteNode {
-        Node node;
-        int strengthTillNow;
-        RouteNode previousNode;
-
-        RouteNode(Node node, RouteNode previousNode, int strength){
-            this.node = node;
-            this.previousNode = previousNode;
-            this.strengthTillNow = strength;
-        }
-    }
-
+    int strength;
+    final Map<String, Node> connectedNodes;
 
     public Node(String name, String isComputer){
         this.name = name;
         this.isComputer = isComputer.equals("COMPUTER");
         this.strength = 5;
         this.connectedNodes = new HashMap<>();
+    }
+
+    public Node(Node node){
+        name = node.name;
+        isComputer = node.isComputer;
+        strength = node.strength;
+        connectedNodes = node.connectedNodes;
     }
 
     void setStrength(int strength) {
@@ -39,10 +32,10 @@ public class Node{
     }
 
     List<String> routeInfo(Node destination){
-        RouteNode enhanced = new RouteNode(this, null, strength);
+        RouteNode routeNode = new RouteNode(this, null, strength);
 
         Queue<RouteNode> pathNodes = new LinkedList<>();
-        pathNodes.offer(enhanced);
+        pathNodes.offer(routeNode);
         Set<String> visitedNodes = new HashSet<>();
         visitedNodes.add(name);
 
@@ -54,34 +47,35 @@ public class Node{
     private ArrayList<String> routeInfo(Node destinationNode, Queue<RouteNode> pathNodes, Set<String> visitedNodes, int strength){
         if(pathNodes.isEmpty()) return new ArrayList<>();
 
-        RouteNode enhancedNode = pathNodes.poll();
-        Node curNode = enhancedNode.node;
-        int strengthTillNow = enhancedNode.strengthTillNow;
+        RouteNode curRouteNode = pathNodes.poll();
+        int strengthTillNow = curRouteNode.strengthTillNow;
 
-        System.out.println(strengthTillNow);
-
-        if(curNode.equals(destinationNode)){
+        if(curRouteNode.equals(destinationNode)){
             ArrayList<String> route = new ArrayList<>();
-            route.add(curNode.name);
-            RouteNode previousNode = enhancedNode.previousNode;
+            route.add(curRouteNode.name);
+            RouteNode previousNode = curRouteNode.previousNode;
             while(previousNode != null){
-                route.add(previousNode.node.name);
+                route.add(previousNode.name);
                 previousNode = previousNode.previousNode;
             }
             return  route;
         }
 
-        for(Map.Entry<String, Node> entry: curNode.connectedNodes.entrySet()){
+        for(Map.Entry<String, Node> entry: curRouteNode.connectedNodes.entrySet()){
             if(!visitedNodes.contains(entry.getKey())){
                 Node child = entry.getValue();
                 if (canNodeSurvive( child, destinationNode, strengthTillNow)){
-                    RouteNode enhancedChild = new RouteNode(child, enhancedNode, getStrength(child, strengthTillNow));
-                    pathNodes.offer(enhancedChild);
+                    RouteNode childRouteNode = new RouteNode(child, curRouteNode, getStrength(child, strengthTillNow));
+                    pathNodes.offer(childRouteNode);
                     visitedNodes.add(child.name);
                 }
             }
         }
         return routeInfo(destinationNode, pathNodes, visitedNodes, strength);
+    }
+
+    private boolean isAlreadyConnected(String name){
+        return connectedNodes.containsKey(name);
     }
 
     private boolean canNodeSurvive(Node child, Node destination, int strengthTillNow){
@@ -90,16 +84,7 @@ public class Node{
     }
 
     private int getStrength(Node child, int strengthTillNow){
-        if(child.isComputer){
-            strengthTillNow --;
-        }else{
-            strengthTillNow *= 2;
-        }
-        return strengthTillNow;
-    }
-
-    private boolean isAlreadyConnected(String name){
-        return connectedNodes.containsKey(name);
+        return child.isComputer ? strengthTillNow - 1 : strengthTillNow * 2;
     }
 
     @Override
