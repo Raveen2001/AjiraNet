@@ -9,14 +9,6 @@ public class AjiraNet {
     }
 
     private void startConsole(){
-
-            for(String s: TestCases.inputs){
-                try{
-                    parseInput(s.split(" "));
-
-                }catch (Exception e){
-                    System.out.println(e.toString());
-                }}
         while(true){
             try{
                String[] input = inputHandler.getInput();
