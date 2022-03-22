@@ -1,10 +1,12 @@
+package network.node;
+
 import java.util.*;
 
 public class Node{
-    final String name;
-    final boolean isComputer;
-    int strength;
-    final Map<String, Node> connectedNodes;
+    public final String name;
+    public final boolean isComputer;
+    public int strength;
+    public final Map<String, Node> connectedNodes;
 
     public Node(String name, String nodeType){
         this.name = name;
@@ -31,7 +33,7 @@ public class Node{
         connectedNodes.put(destination.name, destination);
     }
 
-    List<String> routeInfo(Node destination) throws Exception{
+    public List<String> routeInfo(Node destination) throws Exception{
         if(!destination.isComputer ) throw new Exception("Route cannot be calculated with a repeater.");
 
         RouteNode routeNode = new RouteNode(this, null, strength);

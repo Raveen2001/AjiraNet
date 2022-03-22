@@ -1,3 +1,5 @@
+package network;
+
 public class TestCases {
     static final String[] inputs = {
             "ADD COMPUTER A1",

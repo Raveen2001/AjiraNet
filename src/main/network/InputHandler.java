@@ -1,12 +1,18 @@
+package network;
+
+import commands.*;
+
 import java.util.*;
 
+import static commands.AddCommand.ADD_COMMAND;
+import static commands.ConnectCommand.CONNECT_COMMAND;
+import static commands.ExitCommand.EXIT_COMMAND;
+import static commands.InfoRouteCommand.INFO_ROUTE_COMMAND;
+import static commands.SetDeviceStrengthCommand.SET_DEVICE_STRENGTH_COMMAND;
+
+
 public class InputHandler {
-    static final String ADD_COMMAND = "ADD";
-    static final String SET_DEVICE_STRENGTH_COMMAND = "SET_DEVICE_STRENGTH";
-    static final String CONNECT_COMMAND = "CONNECT";
-    static final String INFO_ROUTE_COMMAND = "INFO_ROUTE";
-    static final String EXIT_COMMAND = "EXIT";
-    private static final List<String> VALID_COMMANDS = Arrays.asList(AddCommand.ADD_COMMAND, SetDeviceStrengthCommand.SET_DEVICE_STRENGTH_COMMAND, ConnectCommand.CONNECT_COMMAND, InfoRouteCommand.INFO_ROUTE_COMMAND, ExitCommand.EXIT_COMMAND);
+    private static final List<String> VALID_COMMANDS = Arrays.asList(ADD_COMMAND, SET_DEVICE_STRENGTH_COMMAND, CONNECT_COMMAND, INFO_ROUTE_COMMAND, EXIT_COMMAND);
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -14,7 +20,7 @@ public class InputHandler {
         System.out.print("> ");
         String[] input = scanner.nextLine().split(" ");
         if(!isValidCommand(input))
-            throw new Exception("Invalid Command Syntax");
+            throw new Exception("Invalid command syntax.");
 
         List<Command> commands = new ArrayList<>();
         addAllCommands(commands);
@@ -33,7 +39,7 @@ public class InputHandler {
 
     public Command getCommand(String[] input) throws Exception{
         if(!isValidCommand(input))
-            throw new Exception("Invalid Command Syntax");
+            throw new Exception("Invalid command syntax.");
 
         Command command = null;
         switch (input[0]){

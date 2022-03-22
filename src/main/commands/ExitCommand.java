@@ -1,5 +1,8 @@
+package commands;
+import network.Network;
+
 public class ExitCommand implements Command {
-    static final String EXIT_COMMAND = "EXIT";
+    public static final String EXIT_COMMAND = "EXIT";
 
     @Override
     public boolean validate() {

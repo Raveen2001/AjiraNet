@@ -1,4 +1,6 @@
-public class RouteNode  extends Node{
+package network.node;
+
+public class RouteNode  extends Node {
     int strengthTillNow;
     RouteNode previousNode;
 

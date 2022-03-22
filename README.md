@@ -1,4 +1,4 @@
-# AjiraNetwork
+# network.AjiraNetwork
 An console based application that let us to develope a local network for communication-related problem
 
 # Get Started
@@ -18,11 +18,11 @@ Successfully added A1
 > ADD COMPUTER A2
 Successfully added A2
 > ADD 
-Error: Invalid Command Syntax
+Error: Invalid commands.Command Syntax
 > ADD REPEATER R1
 Successfully added R1
 > ADD DEVICE A1
-Error: Invalid Command Syntax
+Error: Invalid commands.Command Syntax
 > ADD COMPUTER A1
 Error: That name already exists.
 > ADD COMPUTER A3

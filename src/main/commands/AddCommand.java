@@ -1,8 +1,13 @@
+package commands;
+
+import network.Network;
+import network.node.Node;
+
 import java.util.Arrays;
 import java.util.List;
 
-public class AddCommand implements Command{
-    static final String ADD_COMMAND = "ADD";
+public class AddCommand implements Command {
+    public static final String ADD_COMMAND = "ADD";
     private static final List<String> VALID_DEVICE_TYPE = Arrays.asList("COMPUTER", "REPEATER");
 
     private String[] inputs;

@@ -1,3 +1,6 @@
+package commands;
+
+import network.Network;
 public interface Command {
     void setInputs(String[] inputs);
     boolean validate();

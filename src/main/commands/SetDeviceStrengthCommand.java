@@ -1,11 +1,17 @@
+package commands;
+
+
+import network.Network;
+import network.node.Node;
+
 public class SetDeviceStrengthCommand implements Command {
-    static final String SET_DEVICE_STRENGTH_COMMAND = "SET_DEVICE_STRENGTH";
+    public static final String SET_DEVICE_STRENGTH_COMMAND = "SET_DEVICE_STRENGTH";
 
     private String[] inputs;
     private String deviceName;
     private int strength;
 
-    SetDeviceStrengthCommand(String[] input){
+    public SetDeviceStrengthCommand(String[] input){
         this.inputs = input;
     }
 
