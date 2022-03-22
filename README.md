@@ -1,4 +1,4 @@
-# AjiraNet
+# AjiraNetwork
 An console based application that let us to develope a local network for communication-related problem
 
 # Get Started

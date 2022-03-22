@@ -5,46 +5,56 @@ public class InputHandler {
     static final String SET_DEVICE_STRENGTH_COMMAND = "SET_DEVICE_STRENGTH";
     static final String CONNECT_COMMAND = "CONNECT";
     static final String INFO_ROUTE_COMMAND = "INFO_ROUTE";
-    private static final List<String> VALID_COMMANDS = Arrays.asList(ADD_COMMAND, SET_DEVICE_STRENGTH_COMMAND, CONNECT_COMMAND, INFO_ROUTE_COMMAND);
-    private static final List<String> VALID_NODE_TYPES = Arrays.asList("COMPUTER", "REPEATER");
+    static final String EXIT_COMMAND = "EXIT";
+    private static final List<String> VALID_COMMANDS = Arrays.asList(AddCommand.ADD_COMMAND, SetDeviceStrengthCommand.SET_DEVICE_STRENGTH_COMMAND, ConnectCommand.CONNECT_COMMAND, InfoRouteCommand.INFO_ROUTE_COMMAND, ExitCommand.EXIT_COMMAND);
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
-    public String[] getInput() throws Exception{
+    public Command getCommand() throws Exception{
         System.out.print("> ");
         String[] input = scanner.nextLine().split(" ");
-        if(!isValidCommand(input)) {
+        if(!isValidCommand(input))
             throw new Exception("Invalid Command Syntax");
-        }
-        return input;
-    }
 
+        List<Command> commands = new ArrayList<>();
+        addAllCommands(commands);
 
-
-    private boolean isValidCommand(String[] input){
-        String command = input[0];
-        boolean isValidCommand = (input.length == 3) && VALID_COMMANDS.contains(command);
-        if(isValidCommand){
-            switch (command){
-                case ADD_COMMAND:
-                    return isValidNodeType(input[1]);
-                case SET_DEVICE_STRENGTH_COMMAND:
-                    return isValidSetStrength(input[2]);
+        Command curCommand = null;
+        for(Command command : commands){
+            if (command.doesMatchCommand(input[0])){
+                curCommand = command;
+                curCommand.setInputs(input);
+                break;
             }
         }
-        return isValidCommand;
+        return curCommand;
     }
 
-    private boolean isValidNodeType(String type){
-        return VALID_NODE_TYPES.contains(type);
-    }
 
-    private boolean isValidSetStrength(String strengthString){
-        try{
-            Integer.parseInt(strengthString);
-            return true;
-        }catch (Exception e){
-            return false;
+    public Command getCommand(String[] input) throws Exception{
+        if(!isValidCommand(input))
+            throw new Exception("Invalid Command Syntax");
+
+        Command command = null;
+        switch (input[0]){
+            case ADD_COMMAND -> command = new AddCommand(input);
+            case SET_DEVICE_STRENGTH_COMMAND -> command = new SetDeviceStrengthCommand(input);
+            case CONNECT_COMMAND -> command = new ConnectCommand(input);
+            case INFO_ROUTE_COMMAND -> command = new InfoRouteCommand(input);
+            case EXIT_COMMAND -> command = new ExitCommand();
         }
+        return command;
+    }
+
+    private void addAllCommands(List<Command> commands){
+        commands.add(new AddCommand());
+        commands.add(new SetDeviceStrengthCommand());
+        commands.add(new ConnectCommand());
+        commands.add(new InfoRouteCommand());
+        commands.add(new ExitCommand());
+    }
+
+    private boolean isValidCommand(String[] input){
+        return (input.length > 0 && VALID_COMMANDS.contains(input[0]));
     }
 }

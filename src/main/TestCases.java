@@ -15,7 +15,7 @@ public class TestCases {
 //            "CONNECT R1 A2",
             "CONNECT A2 A3",
             "CONNECT A3 A4",
-            "CONNECT A4 A7",
+//            "CONNECT A4 A7",
             "CONNECT A4 A5",
             "CONNECT A5 A6",
             "CONNECT A6 A7",

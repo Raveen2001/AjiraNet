@@ -31,7 +31,9 @@ public class Node{
         connectedNodes.put(destination.name, destination);
     }
 
-    List<String> routeInfo(Node destination){
+    List<String> routeInfo(Node destination) throws Exception{
+        if(!destination.isComputer ) throw new Exception("Route cannot be calculated with a repeater.");
+
         RouteNode routeNode = new RouteNode(this, null, strength);
         Queue<RouteNode> pathNodes = new LinkedList<>();
         pathNodes.offer(routeNode);
