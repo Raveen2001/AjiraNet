@@ -20,11 +20,11 @@ public class Node{
         connectedNodes = node.connectedNodes;
     }
 
-    void setStrength(int strength) {
+    public void setStrength(int strength) {
         this.strength = strength;
     }
 
-    void connect(Node destination) throws Exception{
+    public void connect(Node destination) throws Exception{
         if(isAlreadyConnected(destination.name)){
             throw new Exception("Devices are already connected.");
         }
@@ -33,45 +33,49 @@ public class Node{
 
     List<String> routeInfo(Node destination){
         RouteNode routeNode = new RouteNode(this, null, strength);
-
         Queue<RouteNode> pathNodes = new LinkedList<>();
         pathNodes.offer(routeNode);
-        Set<String> visitedNodes = new HashSet<>();
-        visitedNodes.add(name);
+        Set<RouteNode> visitedNodes = new HashSet<>();
+        visitedNodes.add(routeNode);
 
-        List<String> route = routeInfo(destination, pathNodes, visitedNodes, strength);
+        return routeInfo(destination, pathNodes, visitedNodes);
+    }
+
+    private List<String> routeInfo(Node destinationNode, Queue<RouteNode> pathNodes, Set<RouteNode> visitedNodes){
+        if(pathNodes.isEmpty()) return new ArrayList<>();
+
+        RouteNode curRouteNode = pathNodes.poll();
+        if(isDestinationNode(curRouteNode, destinationNode)) return getRoute(curRouteNode);
+
+        int strengthTillNow = curRouteNode.strengthTillNow;
+        Map<String, Node> connectedNodes = curRouteNode.connectedNodes;
+
+        for(Map.Entry<String, Node> entry: connectedNodes.entrySet()){
+            Node child = entry.getValue();
+            RouteNode childRouteNode = new RouteNode(child, curRouteNode, getStrength(child, strengthTillNow));
+
+            if (canNodeSurvive(child, destinationNode, strengthTillNow) && !visitedNodes.contains(childRouteNode)) {
+                pathNodes.offer(childRouteNode);
+                visitedNodes.add(childRouteNode);
+            }
+        }
+        return routeInfo(destinationNode, pathNodes, visitedNodes);
+    }
+
+    private List<String> getRoute(RouteNode routeNode){
+        ArrayList<String> route = new ArrayList<>();
+        route.add(routeNode.name);
+        RouteNode previousNode = routeNode.previousNode;
+        while(previousNode != null){
+            route.add(previousNode.name);
+            previousNode = previousNode.previousNode;
+        }
         Collections.reverse(route);
         return route;
     }
 
-    private ArrayList<String> routeInfo(Node destinationNode, Queue<RouteNode> pathNodes, Set<String> visitedNodes, int strength){
-        if(pathNodes.isEmpty()) return new ArrayList<>();
-
-        RouteNode curRouteNode = pathNodes.poll();
-        int strengthTillNow = curRouteNode.strengthTillNow;
-
-        if(curRouteNode.equals(destinationNode)){
-            ArrayList<String> route = new ArrayList<>();
-            route.add(curRouteNode.name);
-            RouteNode previousNode = curRouteNode.previousNode;
-            while(previousNode != null){
-                route.add(previousNode.name);
-                previousNode = previousNode.previousNode;
-            }
-            return  route;
-        }
-
-        for(Map.Entry<String, Node> entry: curRouteNode.connectedNodes.entrySet()){
-            if(!visitedNodes.contains(entry.getKey())){
-                Node child = entry.getValue();
-                if (canNodeSurvive( child, destinationNode, strengthTillNow)){
-                    RouteNode childRouteNode = new RouteNode(child, curRouteNode, getStrength(child, strengthTillNow));
-                    pathNodes.offer(childRouteNode);
-                    visitedNodes.add(child.name);
-                }
-            }
-        }
-        return routeInfo(destinationNode, pathNodes, visitedNodes, strength);
+    private boolean isDestinationNode(RouteNode curRouteNode, Node destinationNode){
+        return curRouteNode.equals(destinationNode);
     }
 
     private boolean isAlreadyConnected(String name){

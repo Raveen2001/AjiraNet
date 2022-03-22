@@ -9,6 +9,13 @@ public class AjiraNet {
     }
 
     private void startConsole(){
+        for(String inp: TestCases.inputs){
+            try{
+                parseInput(inp.split(" "));
+            }catch (Exception e){
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
         while(true){
             try{
                String[] input = inputHandler.getInput();
@@ -25,14 +32,14 @@ public class AjiraNet {
         String arg2 = input[2];
 
         switch (command) {
-            case InputHandler.ADD_COMMAND -> addNode(arg1, arg2);
-            case InputHandler.SET_DEVICE_STRENGTH_COMMAND -> setStrength(arg1, arg2);
-            case InputHandler.CONNECT_COMMAND -> connect(arg1, arg2);
+            case InputHandler.ADD_COMMAND -> addDevice(arg1, arg2);
+            case InputHandler.SET_DEVICE_STRENGTH_COMMAND -> setDeviceStrength(arg1, arg2);
+            case InputHandler.CONNECT_COMMAND -> connectDevices(arg1, arg2);
             case InputHandler.INFO_ROUTE_COMMAND -> routeInfo(arg1, arg2);
         }
     }
 
-    private void addNode(String type, String name) throws Exception{
+    private void addDevice(String type, String name) throws Exception{
         if(isDeviceAvailable(name)){
             throw new Exception("That name already exists.");
         }
@@ -42,7 +49,7 @@ public class AjiraNet {
         System.out.println("Successfully added " + name);
     }
 
-    private void setStrength(String name, String strengthString) throws Exception{
+    private void setDeviceStrength(String name, String strengthString) throws Exception{
         if(!isDeviceAvailable(name)){
             throw new Exception("Device not found.");
         }
@@ -53,7 +60,7 @@ public class AjiraNet {
         System.out.println("Successfully defined strength.");
     }
 
-    private void connect(String source, String destination) throws Exception{
+    private void connectDevices(String source, String destination) throws Exception{
 
         if(!isDeviceAvailable(source) || !isDeviceAvailable(destination)){
             throw new Exception("No source or destination node.");
