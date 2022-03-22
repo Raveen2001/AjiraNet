@@ -6,9 +6,9 @@ public class Node{
     int strength;
     final Map<String, Node> connectedNodes;
 
-    public Node(String name, String isComputer){
+    public Node(String name, String nodeType){
         this.name = name;
-        this.isComputer = isComputer.equals("COMPUTER");
+        this.isComputer = nodeType.equals("COMPUTER");
         this.strength = 5;
         this.connectedNodes = new HashMap<>();
     }
