@@ -7,22 +7,24 @@ public class TestCases {
             "ADD COMPUTER A3",
             "ADD COMPUTER A4",
             "ADD COMPUTER A5",
-            "ADD COMPUTER A6",
-            "ADD COMPUTER A7",
-            "ADD REPEATER R1",
 
             "CONNECT A1 A2",
-//            "CONNECT A2 A7",
-//            "CONNECT A1 R1",
-//            "CONNECT R1 A2",
+            "CONNECT A1 A3",
             "CONNECT A2 A3",
             "CONNECT A3 A4",
-//            "CONNECT A4 A7",
-            "CONNECT A4 A5",
-            "CONNECT A5 A6",
-            "CONNECT A6 A7",
-//            "CONNECT A2 A7",
-//            "SET_DEVICE_STRENGTH A1 7",
-            "INFO_ROUTE A1 A7",
+
+            "SEND A1 A3 HELLO",
+            "ADD_TO_FIREWALL A1 A3",
+            "SEND A1 A3 HELLO",
+
+            "SEND A1 A4 HELLO"
+
+//            "DISABLE SEND A1",
+//            "DISABLE RECEIVE A1",
+//            "SEND A1 A2 HELLO",
+//
+//            "ENABLE SEND A1",
+//            "ENABLE RECEIVE A1",
+//            "SEND A1 A2 HELLO",
     };
 }

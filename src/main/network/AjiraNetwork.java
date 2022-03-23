@@ -2,12 +2,14 @@ package network;
 
 import commands.Command;
 
+import java.util.Arrays;
+
 public class AjiraNetwork extends Network{
-    InputHandler inputHandler;
-    boolean isTestMode = true;
+    private final CommandHandler commandHandler;
+    private final boolean isTestMode = true;
 
     public AjiraNetwork(){
-        inputHandler = new InputHandler();
+        commandHandler = new CommandHandler();
         startConsole();
     }
 
@@ -16,7 +18,7 @@ public class AjiraNetwork extends Network{
 
         while(true){
             try{
-               Command command = inputHandler.getCommand();
+               Command command = commandHandler.getCommand();
                if(command.validate()){
                    command.execute(this);
                }else{
@@ -28,10 +30,14 @@ public class AjiraNetwork extends Network{
         }
     }
 
+
+
+
     private void runTestCases() {
         for(String inp: TestCases.inputs){
+            System.out.println(inp);
             try{
-                Command command = inputHandler.getCommand(inp.split(" "));
+                Command command = commandHandler.getCommand(inp.split(" "));
                 if(command.validate()){
                     command.execute(this);
                 }else{

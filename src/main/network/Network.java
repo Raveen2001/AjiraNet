@@ -6,17 +6,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Network {
-    private final Map<String, Node> devicesAvailable = new HashMap<>();
+    private final Map<String, Node> devices = new HashMap<>();
 
     public void putDevice(Node node){
-        devicesAvailable.put(node.name, node);
+        devices.put(node.name, node);
     }
 
     public Node getDevice(String name){
-        return devicesAvailable.get(name);
+        return devices.get(name);
     }
 
     public boolean isDeviceAvailable(String name){
-        return devicesAvailable.containsKey(name);
+        return devices.containsKey(name);
     }
 }
