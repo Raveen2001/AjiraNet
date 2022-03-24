@@ -8,14 +8,9 @@ public class SetDeviceStrengthCommand implements Command {
     public static final String SET_DEVICE_STRENGTH_COMMAND = "SET_DEVICE_STRENGTH";
 
     private String[] inputs;
-    private String deviceName;
+    private String nodeName;
     private int strength;
 
-    public SetDeviceStrengthCommand(String[] input){
-        this.inputs = input;
-    }
-
-    public SetDeviceStrengthCommand(){}
 
     @Override
     public void setInputs(String[] inputs){
@@ -24,10 +19,10 @@ public class SetDeviceStrengthCommand implements Command {
 
 
     @Override
-    public boolean validate(){
+    public boolean parseInputs(){
         try{
             if(inputs.length != 3) throw new Exception();
-            deviceName = inputs[1];
+            nodeName = inputs[1];
             strength = Integer.parseInt(inputs[2]);
         }catch (Exception e){
             return false;
@@ -37,12 +32,12 @@ public class SetDeviceStrengthCommand implements Command {
 
     @Override
     public void execute(Network network) throws Exception {
-        if(!network.isDeviceAvailable(deviceName)){
+        if(!network.isDeviceAvailable(nodeName)){
             throw new Exception("Device not found.");
         }
 
-        Node device = network.getDevice(deviceName);
-        device.setStrength(strength);
+        Node node = network.getDevice(nodeName);
+        node.setStrength(strength);
         System.out.println("Successfully defined strength.");
     }
 

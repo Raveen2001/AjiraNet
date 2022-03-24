@@ -5,7 +5,7 @@ public class ExitCommand implements Command {
     public static final String EXIT_COMMAND = "EXIT";
 
     @Override
-    public boolean validate() {
+    public boolean parseInputs() {
         return true;
     }
 

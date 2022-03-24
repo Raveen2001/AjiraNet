@@ -1,4 +1,6 @@
+import network.node.ComputerNode;
 import network.node.Node;
+import network.node.RepeaterNode;
 import org.junit.jupiter.api.*;
 
 import java.util.Arrays;
@@ -9,28 +11,24 @@ class NodeTest {
     Node node;
     @BeforeEach
     void setup(){
-        node = new Node("C1", "COMPUTER");
+        node = new ComputerNode("C1");
     }
 
     @Test
     @DisplayName("Create a new computer")
     void testCreateComputer(){
-        node = new Node("C1", "COMPUTER");
+        node = new ComputerNode("C1");
         assertEquals("C1", node.name);
-        assertTrue(node.isComputer);
-        assertEquals(5, node.strength);
-        assertTrue(node.connectedNodes.isEmpty());
+        assertTrue(node.canBeDestination());
     }
 
 
     @Test
     @DisplayName("Create a new repeater")
     void testCreateRepeater(){
-        node = new Node("R1", "REPEATER");
+        node = new RepeaterNode("R1");
         assertEquals("R1", node.name);
-        assertFalse(node.isComputer);
-        assertEquals(5, node.strength);
-        assertTrue(node.connectedNodes.isEmpty());
+        assertFalse(node.canBeDestination());
     }
 
 
@@ -38,88 +36,118 @@ class NodeTest {
     @DisplayName("Change the strength of a device")
     void testSetStrength(){
         node.setStrength(20);
-        assertEquals(20, node.strength);
+        assertEquals(20, node.getStrength());
     }
 
 
     @Test
     @DisplayName("Connect two computers")
     void testConnectDevice1() throws Exception {
-        node = new Node("C1", "COMPUTER");
-        Node desNode = new Node("C2" , "COMPUTER");
-        node.connect(desNode);
+        Node desNode = new ComputerNode("C2");
+        node.makeConnectionTo(desNode);
         assertEquals(1, node.connectedNodes.size());
         assertTrue(node.connectedNodes.containsKey(desNode.name));
         assertEquals(0, desNode.connectedNodes.size());
-        assertThrows(Exception.class, () -> node.connect(desNode));
+        assertThrows(Exception.class, () -> node.makeConnectionTo(desNode));
     }
 
 
     @Test
     @DisplayName("Connect a computer with repeater")
     void testConnectDevice2() throws Exception {
-        node = new Node("C1", "COMPUTER");
-        Node desNode = new Node("R1" , "REPEATER");
-        node.connect(desNode);
+        Node desNode = new RepeaterNode("R1");
+        node.makeConnectionTo(desNode);
         assertEquals(1, node.connectedNodes.size());
         assertTrue(node.connectedNodes.containsKey(desNode.name));
         assertEquals(0, desNode.connectedNodes.size());
-        assertThrows(Exception.class, () -> node.connect(desNode));
+        assertThrows(Exception.class, () -> node.makeConnectionTo(desNode));
     }
 
 
     @Test
     @DisplayName("Connect two repeaters")
     void testConnectDevice3() throws Exception {
-        node = new Node("R1" , "REPEATER");
-        Node desNode = new Node("R2", "REPEATER");
-        node.connect(desNode);
+        node = new RepeaterNode("R1");
+        Node desNode = new RepeaterNode("R2");
+        node.makeConnectionTo(desNode);
         assertEquals(1, node.connectedNodes.size());
         assertTrue(node.connectedNodes.containsKey(desNode.name));
         assertEquals(0, desNode.connectedNodes.size());
-        assertThrows(Exception.class, () -> node.connect(desNode));
+        assertThrows(Exception.class, () -> node.makeConnectionTo(desNode));
     }
 
 
     @Test
     @DisplayName("Connect a repeater with a computer")
     void testConnectDevice4() throws Exception {
-        node = new Node("R1" , "REPEATER");
-        Node desNode = new Node("C1", "COMPUTER");
-        node.connect(desNode);
+        node = new RepeaterNode("R1");
+        Node desNode = new ComputerNode("C1");
+        node.makeConnectionTo(desNode);
         assertEquals(1, node.connectedNodes.size());
         assertTrue(node.connectedNodes.containsKey(desNode.name));
         assertEquals(0, desNode.connectedNodes.size());
-        assertThrows(Exception.class, () -> node.connect(desNode));
+        assertThrows(Exception.class, () -> node.makeConnectionTo(desNode));
     }
 
 
     @Test
     @DisplayName("Get the route between two devices")
     void testRouteInfo() throws Exception{
-        Node node1 = new Node("C1", "COMPUTER");
-        Node node2 = new Node("C2", "COMPUTER");
-        Node node3 = new Node("C3", "COMPUTER");
-        Node node4 = new Node("C4", "COMPUTER");
-        Node node5 = new Node("C5", "COMPUTER");
-        Node node6 = new Node("C6", "COMPUTER");
-        Node node7 = new Node("C7", "COMPUTER");
+        Node node1 = new ComputerNode("C1");
+        Node node2 = new ComputerNode("C2");
+        Node node3 = new ComputerNode("C3");
+        Node node4 = new ComputerNode("C4");
+        Node node5 = new ComputerNode("C5");
+        Node node6 = new ComputerNode("C6");
+        Node node7 = new ComputerNode("C7");
 
-        node.connect(node1);
-        node1.connect(node2);
-        node2.connect(node3);
-        node3.connect(node4);
-        node4.connect(node5);
-        node5.connect(node6);
-        node6.connect(node7);
+        node1.makeConnectionTo(node2);
+        node2.makeConnectionTo(node3);
+        node3.makeConnectionTo(node4);
+        node4.makeConnectionTo(node5);
+        node5.makeConnectionTo(node6);
+        node6.makeConnectionTo(node7);
 
-//        assertEquals(Arrays.asList("C1", "C2", "C3"), node1.routeInfo(node3));
-//        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6"), node1.routeInfo(node6));
-//        assertTrue(node1.routeInfo(node7).isEmpty());  // due to no strength there will be no path
-//        node1.setStrength(10);
-//        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6", "C7"), node1.routeInfo(node7));
-//
-//        node2.connect(node7);
-//        assertEquals(Arrays.asList("C1", "C2", "C7"), node1.routeInfo(node7));
+        assertEquals(Arrays.asList("C1", "C2", "C3"), node1.getRoute(node3));
+        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6"), node1.getRoute(node6));
+        assertThrows(Exception.class, () -> node1.getRoute(node7));  // due to no strength there will be no path
+        node1.setStrength(10);
+        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6", "C7"), node1.getRoute(node7));
+
+
+        node2.makeConnectionTo(node7);
+        assertEquals(Arrays.asList("C1", "C2", "C7"), node1.getRoute(node7));
+    }
+
+
+    @Test
+    @DisplayName("Disable commands")
+    void testDisableCommands() throws Exception {
+        Node desNode = new ComputerNode("C2");
+        node.makeConnectionTo(desNode);
+
+        assertTrue(node.canSend);
+        assertTrue(node.canReceive);
+
+        node.disableReceive();
+        node.disableSend();
+
+
+        assertFalse(node.canSend);
+        assertFalse(node.canReceive);
+    }
+
+
+    @Test
+    @DisplayName("Add to firewall")
+    void testAddToFirewall() throws Exception {
+        Node desNode = new ComputerNode("C2");
+        node.makeConnectionTo(desNode);
+
+        assertDoesNotThrow(() -> node.sendMessage(desNode, "Hello"));
+
+        node.addToBlacklist(desNode.name);
+
+        assertThrows(Exception.class, () -> node.sendMessage(desNode, "Hello"));
     }
 }

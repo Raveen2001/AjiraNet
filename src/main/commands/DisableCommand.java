@@ -20,19 +20,16 @@ public class DisableCommand implements Command {
     }
 
     @Override
-    public boolean validate() {
+    public boolean parseInputs() {
         String command = inputs[1];
         if(inputs.length != 3 || !VALID_DISABLE_COMMANDS.contains(command)){
             return false;
         }
 
-        if(command.equals("SEND")) isSend = true;
-        else isSend = false;
+        isSend = command.equals("SEND");
         nodeName = inputs[2];
         return true;
     }
-
-    // DISABLE SEND/RECIEVE A1
 
     @Override
     public void execute(Network network) throws Exception {
@@ -41,14 +38,12 @@ public class DisableCommand implements Command {
         }
 
         Node node = network.getDevice(nodeName);
-//        isSend -> SEND(true) RECIEVE(false)
         if(isSend) {
-            node.setCanSend(false);
+            node.disableSend();
         }else{
-            node.setCanReceive(false);
+            node.disableReceive();
         }
-//        System.out.println(node.canSend);
-//        System.out.println(node.canReceive);
+
         System.out.println("Successfully disabled " + (isSend? "Send" : "Receive") + ".");
     }
 

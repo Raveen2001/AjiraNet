@@ -7,8 +7,8 @@ public class SendCommand implements Command{
     public static String SEND_COMMAND = "SEND";
 
     private String[] inputs;
-    private String source;
-    private String destination;
+    private String from;
+    private String to;
     private String message;
     @Override
     public void setInputs(String[] inputs) {
@@ -16,29 +16,25 @@ public class SendCommand implements Command{
     }
 
     @Override
-    public boolean validate() {
+    public boolean parseInputs() {
 
         if(inputs.length != 4) return false;
-        source = inputs[1];
-        destination = inputs[2];
+        from = inputs[1];
+        to = inputs[2];
         message = inputs[3];
         return true;
     }
 
     @Override
     public void execute(Network network) throws Exception {
-        if(!network.isDeviceAvailable(source) || !network.isDeviceAvailable(destination)){
+        if(!network.isDeviceAvailable(from) || !network.isDeviceAvailable(to)){
             throw new Exception("No node found.");
         }
 
-        Node sourceNode = network.getDevice(source);
-        Node destinationNode = network.getDevice(destination);
+        Node fromNode = network.getDevice(from);
+        Node toNode = network.getDevice(to);
 
-        if(sourceNode.hasBlacklisted(destinationNode) || destinationNode.hasBlacklisted(sourceNode)){
-            throw new Exception("Message can't be sent since node is blocked.");
-        }
-
-        sourceNode.sendMessage(destinationNode, message);
+        fromNode.sendMessage(toNode, message);
     }
 
     @Override

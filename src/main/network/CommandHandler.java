@@ -26,8 +26,6 @@ public class CommandHandler {
         addAllCommands();
     }
 
-
-
     public Command getCommand() throws Exception{
         System.out.print("> ");
         String[] input = scanner.nextLine().split(" ");
@@ -42,26 +40,6 @@ public class CommandHandler {
                 break;
             }
         }
-        return curCommand;
-    }
-
-
-    public Command getCommand(String[] input) throws Exception{
-        if(!isValidCommand(input))
-            throw new Exception("Invalid command syntax.");
-
-
-        Command curCommand = null;
-        for(Command command : commands){
-            if (command.doesMatchCommand(input[0])){
-                curCommand = command;
-                curCommand.setInputs(input);
-                break;
-            }
-        }
-
-
-
         return curCommand;
     }
 

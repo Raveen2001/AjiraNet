@@ -3,166 +3,183 @@ package network.node;
 import java.util.*;
 
 
-public class Node{
+public abstract class Node{
     public final String name;
-    public final boolean isComputer;
-    public int strength;
+    protected int strength;
     public boolean canSend;
     public boolean canReceive;
     public final Map<String, Node> connectedNodes;
-    public Map<String, Node> blacklistedNodes;
+    public List<String> blacklistedNodes;
 
 
-    public Node(String name, String nodeType){
+    public Node(String name){
         this.name = name;
-        this.isComputer = nodeType.equals("COMPUTER");
-        this.strength = 5;
         this.canSend = true;
         this.canReceive = true;
         this.connectedNodes = new HashMap<>();
-        this.blacklistedNodes = new HashMap<>();
+        this.blacklistedNodes = new ArrayList<>();
     }
 
-    public Node(Node node){
-        name = node.name;
-        isComputer = node.isComputer;
-        strength = node.strength;
-        connectedNodes = node.connectedNodes;
-        canReceive = node.canReceive;
-        canSend = node.canSend;
-        blacklistedNodes = node.blacklistedNodes;
+    public abstract int getUpdatedStrength(int strength);
+    public abstract boolean canBeDestination();
+
+
+    public int getStrength(){
+        return this.strength;
     }
 
-    public void setStrength(int strength) {
+
+    public void setStrength(int strength){
         this.strength = strength;
     }
 
-    public void connect(Node destination) throws Exception{
-        if(isAlreadyConnected(destination.name)){
+
+    public void makeConnectionTo(Node destination) throws Exception{
+        boolean isSameSourceAndDestination = this.equals(destination);
+        if(isSameSourceAndDestination){
+            throw new Exception("Cannot connect device to itself.");
+        }
+
+        if(connectedNodes.containsKey(destination.name)){
             throw new Exception("Devices are already connected.");
         }
         connectedNodes.put(destination.name, destination);
     }
 
-    public void printRoute(Node destination) throws Exception{
-        if(!destination.isComputer ) throw new Exception("Route cannot be calculated with a repeater.");
+    public List<String> getRoute(Node toNode) throws Exception{
+        if(!toNode.canBeDestination()) throw new Exception("Route cannot be calculated with a repeater.");
 
-        Queue<Node> pathNodes = new LinkedList<>();
-        pathNodes.offer(this);
-        Set<Node> visitedNodes = new HashSet<>();
-        visitedNodes.add(this);
-
-        Router route = getRoute(destination, pathNodes, visitedNodes, new Router());
-        route.printRoute();
+        return getRoute(toNode, false);
     }
 
-    public Router getRoute(Node destinationNode, Queue<Node> pathNodes, Set<Node> visitedNodes, Router route) throws Exception{
-        if(pathNodes.isEmpty()) throw new Exception("No Route Found.");
+    private List<String> getRoute(Node toNode, boolean isFirewallApplied) throws Exception{
+        Node curNode = this;
 
-        Node curNode = pathNodes.poll();
+        // queue is used for bfs.
+        Queue<Node> queue = new ArrayDeque<>();
+        queue.offer(curNode);
 
-        Router newRoute = new Router(route, curNode);
-        if(curNode.equals(destinationNode)) return new Router(route, curNode);
+        // visitedNodes is used to keep track of the visited nodes,so we don't run into infinite loop
+        Set<Node> visitedNodes = new HashSet<>();
 
-        int strengthTillNow = newRoute.getStrengthTillNow();
-        Map<String, Node> connectedNodes = curNode.connectedNodes;
+        Map<Node, Node> previousNodes = new HashMap<>();
+        Map<Node, Integer> strengthTillNode = new HashMap<>();
 
-        for(Map.Entry<String, Node> entry: connectedNodes.entrySet()){
-            Node childNode = entry.getValue();
-            if (canNodeSurvive(childNode, destinationNode, strengthTillNow) && !visitedNodes.contains(childNode)) {
-                pathNodes.offer(childNode);
-                visitedNodes.add(childNode);
+        previousNodes.put(curNode, null);
+        strengthTillNode.put(curNode, curNode.strength);
+
+        while(!queue.isEmpty()){
+            curNode = queue.poll();
+
+            boolean isDestinationNode = curNode.equals(toNode);
+            if(isDestinationNode){
+                return getRoute(previousNodes, toNode);
             }
+
+            int strengthTillNow = strengthTillNode.get(curNode);
+            for(var connectedNode: curNode.connectedNodes.values()){
+                if(!visitedNodes.contains(connectedNode) && canNodeSurvive(connectedNode, strengthTillNow)){
+
+                    // either firewall is to be applied
+                    // or curNode can send message to the connected node
+                    boolean canGoToConnectedNode = !isFirewallApplied || curNode.canSendMessageTo(connectedNode);
+
+                    if(canGoToConnectedNode){
+                        queue.offer(connectedNode);
+                        previousNodes.put(connectedNode, curNode);
+                        strengthTillNode.put(connectedNode, connectedNode.getUpdatedStrength(strengthTillNow));
+                    }
+                }
+            }
+            visitedNodes.add(curNode);
         }
-        return getRoute(destinationNode, pathNodes, visitedNodes, newRoute);
+
+        throw new Exception("No route found.");
     }
 
 
-
-
-    public void sendMessage(Node destination, String message) throws Exception{
-        if(!destination.isComputer ) throw new Exception("Route cannot be calculated with a repeater.");
-
-        Queue<Node> pathNodes = new LinkedList<>();
-        pathNodes.offer(this);
-        Set<Node> visitedNodes = new HashSet<>();
-        visitedNodes.add(this);
-
-        Router sentRoute = getSentPath(destination, pathNodes, visitedNodes, new Router());
-        int hops = sentRoute.getHops();
-        if(hops < 0){
-            throw new Exception("Can't send to destination.");
+    public void sendMessage(Node toNode, String message) throws Exception{
+        if(this.hasBlacklisted(toNode.name) || toNode.hasBlacklisted(this.name)){
+            throw new Exception("Message can't be sent since node is blocked.");
         }
-        sentRoute.printRoute();
+
+        List<String> path = getRoute(toNode, true);
+        int hops = path.size() - 1;
         System.out.println("Received Message : " + message);
         System.out.println("Hops: " + hops);
     }
 
-    public Router getSentPath(Node destinationNode, Queue<Node> pathNodes, Set<Node> visitedNodes, Router route) throws Exception{
-        if(pathNodes.isEmpty()) throw new Exception("No Route Found.");
 
-        Node curNode = pathNodes.poll();
-        Router newRoute = new Router(route, curNode);
-        if(curNode.equals(destinationNode)) return new Router(route, curNode);
-
-        int strengthTillNow = newRoute.getStrengthTillNow();
-        Map<String, Node> connectedNodes = curNode.connectedNodes;
-
-        for(Map.Entry<String, Node> entry: connectedNodes.entrySet()){
-
-            Node childNode = entry.getValue();
-            if (canNodeSurvive(childNode, destinationNode, strengthTillNow) && canSendMessageBetweenNode(curNode, childNode) && !visitedNodes.contains(childNode)) {
-                pathNodes.offer(childNode);
-                visitedNodes.add(childNode);
-            }
-        }
-        return getSentPath(destinationNode, pathNodes, visitedNodes, newRoute);
+    public void enableSend(){
+        this.canSend = true;
     }
 
-    private boolean canSendMessageBetweenNode(Node curNode, Node child) {
-        return curNode.canSend && child.canReceive && !curNode.hasBlacklisted(child);
+    public void disableSend(){
+        this.canSend = false;
     }
 
-    public void setCanSend(boolean canSend){
-        this.canSend = canSend;
+    public void enableReceive(){
+        this.canReceive = true;
     }
 
-    public void setCanReceive(boolean canReceive){
-        this.canReceive = canReceive;
+    public void disableReceive(){
+        this.canReceive = false;
     }
 
-    public boolean hasBlacklisted(Node node){
-        return blacklistedNodes.containsKey(node.name);
+
+    // utility functions
+
+    private boolean canNodeSurvive(Node toNode, int strengthTillNow) {
+        return toNode.getUpdatedStrength(strengthTillNow) >= 0;
     }
 
-    private boolean isDestinationNode(Router curRouteNode, Node destinationNode){
-        return curRouteNode.equals(destinationNode);
+    private boolean canSendMessageTo(Node node) {
+        return (this.canSend && node.canReceive && !this.hasBlacklisted(node.name));
+    }
+
+    public void addToBlacklist(String name){
+        blacklistedNodes.add(name);
+    }
+
+    public boolean hasBlacklisted(String name){
+        return blacklistedNodes.contains(name);
     }
 
     private boolean isAlreadyConnected(String name){
         return connectedNodes.containsKey(name);
     }
 
-    private boolean canNodeSurvive(Node child, Node destination, int strengthTillNow){
-        strengthTillNow = getStrength(child, strengthTillNow);
-        return strengthTillNow != 0 || child.equals(destination);
+    private List<String> getRoute(Map<Node, Node> previousNodes, Node destinationNode){
+        List<String> path = new ArrayList<>();
+        path.add(destinationNode.name);
+
+        Node previous = previousNodes.get(destinationNode);
+        while (previous != null){
+            path.add(previous.name);
+            previous = previousNodes.get(previous);
+        }
+
+        Collections.reverse(path);
+        return path;
     }
-
-
-    private int getStrength(Node child, int strengthTillNow){
-        return child.isComputer ? strengthTillNow - 1 : strengthTillNow * 2;
-    }
-
-
-
+    
     @Override
     public boolean equals(Object o) {
+        if(o == null || getClass() != o.getClass()) return false;
+        if(o == this) return true;
+
         Node node = (Node) o;
         return name.equals(node.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 
     @Override
     public String toString() {
         return name;
     }
+    
 }

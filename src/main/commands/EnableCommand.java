@@ -13,20 +13,21 @@ public class EnableCommand implements Command {
     private String[] inputs;
     private boolean isSend;
     private String nodeName;
+
+
     @Override
     public void setInputs(String[] inputs) {
         this.inputs = inputs;
     }
 
     @Override
-    public boolean validate() {
+    public boolean parseInputs() {
         String command = inputs[1];
         if(inputs.length != 3 || !VALID_ENABLE_COMMANDS.contains(command)){
             return false;
         }
 
-        if(command.equals("SEND")) isSend = true;
-        else isSend = false;
+        isSend = command.equals("SEND");
         nodeName = inputs[2];
         return true;
     }
@@ -39,12 +40,10 @@ public class EnableCommand implements Command {
 
         Node node = network.getDevice(nodeName);
         if(isSend) {
-            node.setCanSend(true);
+            node.enableSend();
         }else{
-            node.setCanReceive(true);
+            node.enableReceive();
         }
-//        System.out.println(node.canSend);
-//        System.out.println(node.canReceive);
         System.out.println("Successfully enabled " + (isSend? "Send" : "Receive") + ".");
     }
 

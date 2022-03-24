@@ -1,7 +1,9 @@
 package commands;
 
 import network.Network;
+import network.node.ComputerNode;
 import network.node.Node;
+import network.node.RepeaterNode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,12 +13,8 @@ public class AddCommand implements Command {
     private static final List<String> VALID_DEVICE_TYPE = Arrays.asList("COMPUTER", "REPEATER");
 
     private String[] inputs;
-    private String deviceType;
-    private String deviceName;
-
-    public AddCommand(String[] input){
-        this.inputs = input;
-    }
+    private String nodeType;
+    private String nodeName;
 
     public AddCommand(){}
 
@@ -26,23 +24,26 @@ public class AddCommand implements Command {
     }
 
     @Override
-    public boolean validate(){
+    public boolean parseInputs(){
         if(inputs.length != 3 || !VALID_DEVICE_TYPE.contains(inputs[1]))
             return false;
-        deviceType = inputs[1];
-        deviceName = inputs[2];
+        nodeType = inputs[1];
+        nodeName = inputs[2];
         return true;
     }
 
     @Override
     public void execute(Network network) throws Exception{
-        if(network.isDeviceAvailable(deviceName)){
+        if(network.isDeviceAvailable(nodeName)){
             throw new Exception("That name already exists.");
         }
 
-        Node node = new Node(deviceName, deviceType);
+        Node node;
+        if(nodeType.equals("COMPUTER")) node = new ComputerNode(nodeName);
+        else node = new RepeaterNode(nodeName);
+
         network.putDevice(node);
-        System.out.println("Successfully added " + deviceName);
+        System.out.println("Successfully added " + nodeName);
     }
 
     @Override

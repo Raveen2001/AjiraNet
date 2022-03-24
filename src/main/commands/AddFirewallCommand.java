@@ -9,35 +9,36 @@ public class AddFirewallCommand implements Command {
 
     private String[] inputs;
     private String source;
-    private String blacklist;
+    private String target;
+
+
     @Override
     public void setInputs(String[] inputs) {
         this.inputs = inputs;
     }
 
     @Override
-    public boolean validate() {
+    public boolean parseInputs() {
         if(inputs.length != 3) return false;
         source = inputs[1];
-        blacklist = inputs[2];
+        target = inputs[2];
         return true;
     }
 
     @Override
     public void execute(Network network) throws Exception {
-        if(!network.isDeviceAvailable(source) || !network.isDeviceAvailable(blacklist)){
+        if(!network.isDeviceAvailable(source) || !network.isDeviceAvailable(target)){
             throw new Exception("No node found");
         }
 
         Node sourceNode = network.getDevice(source);
-        Node blacklistNode = network.getDevice(blacklist);
 
-        if(sourceNode.blacklistedNodes.containsKey(blacklistNode.name)){
+        if(sourceNode.hasBlacklisted(target)){
             throw new Exception("Node already blocked");
         }
 
-        sourceNode.blacklistedNodes.put(blacklistNode.name, blacklistNode);
-        System.out.println(blacklistNode.name + " added to " + sourceNode.name + "’s firewall.");
+        sourceNode.addToBlacklist(target);
+        System.out.println(target + " added to " + sourceNode + "’s firewall.");
     }
 
     @Override
