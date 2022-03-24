@@ -1,4 +1,4 @@
-package commands;
+package network.commands;
 
 import network.Network;
 import network.node.ComputerNode;
@@ -11,6 +11,7 @@ import java.util.List;
 public class AddCommand implements Command {
     public static final String ADD_COMMAND = "ADD";
     private static final List<String> VALID_DEVICE_TYPE = Arrays.asList("COMPUTER", "REPEATER");
+    public static final String CLASS_NAME = "network.commands.AddCommand";
 
     private String[] inputs;
     private String nodeType;
@@ -46,8 +47,4 @@ public class AddCommand implements Command {
         System.out.println("Successfully added " + nodeName);
     }
 
-    @Override
-    public boolean doesMatchCommand(String command) {
-        return command.equals(ADD_COMMAND);
-    }
 }

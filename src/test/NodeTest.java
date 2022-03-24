@@ -1,6 +1,7 @@
 import network.node.ComputerNode;
 import network.node.Node;
 import network.node.RepeaterNode;
+import network.utils.PathFinder;
 import org.junit.jupiter.api.*;
 
 import java.util.Arrays;
@@ -35,8 +36,8 @@ class NodeTest {
     @Test
     @DisplayName("Change the strength of a device")
     void testSetStrength(){
-        node.setStrength(20);
-        assertEquals(20, node.getStrength());
+        node.strength = 20;
+        assertEquals(20, node.strength);
     }
 
 
@@ -93,6 +94,7 @@ class NodeTest {
     @Test
     @DisplayName("Get the route between two devices")
     void testRouteInfo() throws Exception{
+        PathFinder pathFinder;
         Node node1 = new ComputerNode("C1");
         Node node2 = new ComputerNode("C2");
         Node node3 = new ComputerNode("C3");
@@ -108,15 +110,28 @@ class NodeTest {
         node5.makeConnectionTo(node6);
         node6.makeConnectionTo(node7);
 
-        assertEquals(Arrays.asList("C1", "C2", "C3"), node1.getRoute(node3));
-        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6"), node1.getRoute(node6));
-        assertThrows(Exception.class, () -> node1.getRoute(node7));  // due to no strength there will be no path
-        node1.setStrength(10);
-        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6", "C7"), node1.getRoute(node7));
+        pathFinder = new PathFinder(node1, node2, false);
+        pathFinder.findPath();
+        assertEquals(Arrays.asList("C1", "C2", "C3"), pathFinder.path);
+
+        pathFinder = new PathFinder(node1, node6, false);
+        pathFinder.findPath();
+        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6"), pathFinder.path);
+
+        PathFinder pathFinder1 = new PathFinder(node1, node6, false);
+        assertThrows(Exception.class, () -> pathFinder1.findPath());  // due to no strength there will be no path
+        node1.strength = 10;
+
+        pathFinder = new PathFinder(node1, node7, false);
+        pathFinder.findPath();
+        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6", "C7"), pathFinder.path);
 
 
         node2.makeConnectionTo(node7);
-        assertEquals(Arrays.asList("C1", "C2", "C7"), node1.getRoute(node7));
+        pathFinder = new PathFinder(node1, node7, false);
+        pathFinder.findPath();
+
+        assertEquals(Arrays.asList("C1", "C2", "C7"), pathFinder.path);
     }
 
 
@@ -129,8 +144,8 @@ class NodeTest {
         assertTrue(node.canSend);
         assertTrue(node.canReceive);
 
-        node.disableReceive();
-        node.disableSend();
+        node.setCanSend(false);
+        node.setCanReceive(false);
 
 
         assertFalse(node.canSend);
@@ -144,10 +159,12 @@ class NodeTest {
         Node desNode = new ComputerNode("C2");
         node.makeConnectionTo(desNode);
 
-        assertDoesNotThrow(() -> node.sendMessage(desNode, "Hello"));
+        PathFinder pathFinder = new PathFinder(node, desNode, true);
+        assertDoesNotThrow(pathFinder::findPath);
 
         node.addToBlacklist(desNode.name);
 
-        assertThrows(Exception.class, () -> node.sendMessage(desNode, "Hello"));
+        pathFinder = new PathFinder(node, desNode, true);
+        assertThrows(Exception.class, pathFinder::findPath);
     }
 }

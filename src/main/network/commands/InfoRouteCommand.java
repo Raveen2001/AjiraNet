@@ -1,10 +1,14 @@
-package commands;
+package network.commands;
 
 import network.Network;
 import network.node.Node;
+import network.utils.Path;
+import network.utils.PathFinder;
 
 public class InfoRouteCommand implements Command {
     public static final String INFO_ROUTE_COMMAND = "INFO_ROUTE";
+    public static final String CLASS_NAME = "network.commands.InfoRouteCommand";
+
 
     private String[] inputs;
     private String from;
@@ -33,11 +37,9 @@ public class InfoRouteCommand implements Command {
         Node fromNode = network.getDevice(from);
         Node toNode = network.getDevice(to);
 
-        fromNode.getRoute(toNode);
+        PathFinder pathFinder = new PathFinder(fromNode, toNode, false);
+        Path path = pathFinder.getPath();
+        path.printPath();
     }
 
-    @Override
-    public boolean doesMatchCommand(String command) {
-        return command.equals(INFO_ROUTE_COMMAND);
-    }
 }

@@ -1,7 +1,8 @@
-import network.AjiraNetwork;
+import network.AjiraNetwork;;
 
 public class Main {
     public static void main(String[] args) {
-        new AjiraNetwork();
+        AjiraNetwork agiraNet = new AjiraNetwork();
+        agiraNet.startConsole();
     }
 }

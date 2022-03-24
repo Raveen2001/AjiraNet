@@ -1,44 +1,41 @@
-package commands;
+package network.commands;
 
 import network.Network;
 import network.node.Node;
 
-public class SendCommand implements Command{
-    public static String SEND_COMMAND = "SEND";
+public class ConnectCommand implements Command {
+    public static final String CONNECT_COMMAND = "CONNECT";
+    public static final String CLASS_NAME = "network.commands.ConnectCommand";
+
 
     private String[] inputs;
     private String from;
     private String to;
-    private String message;
+
     @Override
-    public void setInputs(String[] inputs) {
+    public void setInputs(String[] inputs){
         this.inputs = inputs;
     }
 
     @Override
     public boolean parseInputs() {
-
-        if(inputs.length != 4) return false;
+        if(inputs.length != 3)
+            return false;
         from = inputs[1];
         to = inputs[2];
-        message = inputs[3];
         return true;
     }
 
     @Override
     public void execute(Network network) throws Exception {
         if(!network.isDeviceAvailable(from) || !network.isDeviceAvailable(to)){
-            throw new Exception("No node found.");
+            throw new Exception("No source or destination node.");
         }
 
         Node fromNode = network.getDevice(from);
         Node toNode = network.getDevice(to);
-
-        fromNode.sendMessage(toNode, message);
+        fromNode.makeConnectionTo(toNode);
+        System.out.println("Successfully connected.");
     }
 
-    @Override
-    public boolean doesMatchCommand(String command) {
-        return command.equals(SEND_COMMAND);
-    }
 }

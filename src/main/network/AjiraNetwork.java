@@ -1,15 +1,16 @@
 package network;
 
-import commands.Command;
+import network.commands.Command;
+import network.commands.CommandHandler;
+
 public class AjiraNetwork extends Network{
     private final CommandHandler commandHandler;
 
     public AjiraNetwork(){
         commandHandler = new CommandHandler();
-        startConsole();
     }
 
-    private void startConsole(){
+    public void startConsole(){
         while(true){
             try{
                Command command = commandHandler.getCommand();

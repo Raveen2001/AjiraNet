@@ -1,4 +1,4 @@
-package commands;
+package network.commands;
 
 
 import network.Network;
@@ -6,6 +6,8 @@ import network.node.Node;
 
 public class SetDeviceStrengthCommand implements Command {
     public static final String SET_DEVICE_STRENGTH_COMMAND = "SET_DEVICE_STRENGTH";
+    public static final String CLASS_NAME = "network.commands.SetDeviceStrengthCommand";
+
 
     private String[] inputs;
     private String nodeName;
@@ -37,12 +39,8 @@ public class SetDeviceStrengthCommand implements Command {
         }
 
         Node node = network.getDevice(nodeName);
-        node.setStrength(strength);
+        node.strength = strength;
         System.out.println("Successfully defined strength.");
     }
 
-    @Override
-    public boolean doesMatchCommand(String command) {
-        return command.equals(SET_DEVICE_STRENGTH_COMMAND);
-    }
 }
