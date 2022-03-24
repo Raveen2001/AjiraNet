@@ -1,6 +1,7 @@
 import network.node.ComputerNode;
 import network.node.Node;
 import network.node.RepeaterNode;
+import network.utils.Path;
 import network.utils.PathFinder;
 import org.junit.jupiter.api.*;
 
@@ -111,27 +112,27 @@ class NodeTest {
         node6.makeConnectionTo(node7);
 
         pathFinder = new PathFinder(node1, node2, false);
-        pathFinder.findPath();
-        assertEquals(Arrays.asList("C1", "C2", "C3"), pathFinder.path);
+        Path path = pathFinder.getPath();
+        assertEquals(Arrays.asList("C1", "C2"), path.getPath());
 
         pathFinder = new PathFinder(node1, node6, false);
-        pathFinder.findPath();
-        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6"), pathFinder.path);
+        path = pathFinder.getPath();
+        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6"), path.getPath());
 
-        PathFinder pathFinder1 = new PathFinder(node1, node6, false);
-        assertThrows(Exception.class, () -> pathFinder1.findPath());  // due to no strength there will be no path
+        PathFinder pathFinder1 = new PathFinder(node1, node7, false);
+        assertThrows(Exception.class, () -> pathFinder1.getPath());  // due to no strength there will be no path
         node1.strength = 10;
 
         pathFinder = new PathFinder(node1, node7, false);
-        pathFinder.findPath();
-        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6", "C7"), pathFinder.path);
+        path = pathFinder.getPath();
+        assertEquals(Arrays.asList("C1", "C2", "C3", "C4", "C5", "C6", "C7"), path.getPath());
 
 
         node2.makeConnectionTo(node7);
         pathFinder = new PathFinder(node1, node7, false);
-        pathFinder.findPath();
+        path = pathFinder.getPath();
 
-        assertEquals(Arrays.asList("C1", "C2", "C7"), pathFinder.path);
+        assertEquals(Arrays.asList("C1", "C2", "C7"), path.getPath());
     }
 
 
@@ -160,11 +161,11 @@ class NodeTest {
         node.makeConnectionTo(desNode);
 
         PathFinder pathFinder = new PathFinder(node, desNode, true);
-        assertDoesNotThrow(pathFinder::findPath);
+        assertDoesNotThrow(pathFinder::getPath);
 
         node.addToBlacklist(desNode.name);
 
         pathFinder = new PathFinder(node, desNode, true);
-        assertThrows(Exception.class, pathFinder::findPath);
+        assertThrows(Exception.class, pathFinder::getPath);
     }
 }
