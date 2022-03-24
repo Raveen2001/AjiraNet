@@ -5,6 +5,7 @@ import java.util.*;
 
 public abstract class Node{
     public final String name;
+    public String type;
     public int strength;
     public boolean canSend = true;
     public boolean canReceive = true;

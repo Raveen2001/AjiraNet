@@ -4,6 +4,7 @@ public class ComputerNode extends Node{
     public ComputerNode(String name) {
         super(name);
         super.strength = 5;
+        super.type = "COMPUTER";
     }
 
     @Override

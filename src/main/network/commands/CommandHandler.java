@@ -8,7 +8,7 @@ public class CommandHandler {
 
     public CommandHandler(){
         scanner = new Scanner(System.in);
-        addAllCommandClasses();
+        addAllCommandsWithClassName();
     }
 
     public Command getCommand() throws Exception{
@@ -23,7 +23,11 @@ public class CommandHandler {
         return curCommand;
     }
 
-    private void addAllCommandClasses(){
+    private boolean isValidCommand(String[] input){
+        return (input.length > 0 && COMMANDS_WITH_CLASS_NAMES.containsKey(input[0]));
+    }
+
+    private void addAllCommandsWithClassName(){
         COMMANDS_WITH_CLASS_NAMES.put(AddCommand.ADD_COMMAND, AddCommand.CLASS_NAME);
         COMMANDS_WITH_CLASS_NAMES.put(SetDeviceStrengthCommand.SET_DEVICE_STRENGTH_COMMAND, SetDeviceStrengthCommand.CLASS_NAME);
         COMMANDS_WITH_CLASS_NAMES.put(ConnectCommand.CONNECT_COMMAND, ConnectCommand.CLASS_NAME);
@@ -33,9 +37,5 @@ public class CommandHandler {
         COMMANDS_WITH_CLASS_NAMES.put(EnableDisableCommand.ENABLE_COMMAND, EnableDisableCommand.CLASS_NAME);
         COMMANDS_WITH_CLASS_NAMES.put(EnableDisableCommand.DISABLE_COMMAND, EnableDisableCommand.CLASS_NAME);
         COMMANDS_WITH_CLASS_NAMES.put(ExitCommand.EXIT_COMMAND, ExitCommand.CLASS_NAME);
-    }
-
-    private boolean isValidCommand(String[] input){
-        return (input.length > 0 && COMMANDS_WITH_CLASS_NAMES.containsKey(input[0]));
     }
 }

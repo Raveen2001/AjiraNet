@@ -4,6 +4,7 @@ public class RepeaterNode extends Node{
     public RepeaterNode(String name) {
         super(name);
         super.strength = 0;
+        super.type = "REPEATER";
     }
 
     @Override
